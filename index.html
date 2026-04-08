@@ -3,61 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Coconut Ascension: Clicker of the Tropics</title>
+    <title>Coconut Ascension: Tropical Clicker Odyssey</title>
     <style>
         * {
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation; /* Prevents zoom on double-tap */
+            touch-action: manipulation;
         }
         body {
             margin: 0;
             min-height: 100vh;
-            background: linear-gradient(145deg, #4a2f1d 0%, #2d1e12 100%);
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
+            background: linear-gradient(145deg, #1b4d2e 0%, #0e2a1a 100%);
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             position: relative;
             overflow-x: hidden;
-            touch-action: pan-y pinch-zoom; /* Allows vertical scroll but prevents double-tap zoom */
         }
 
-        .tree-left, .tree-right {
+        /* Tropical leaves decoration */
+        .leaf-left, .leaf-right {
             position: fixed;
             bottom: 0;
-            width: 200px;
-            height: auto;
+            width: 180px;
             pointer-events: none;
             z-index: 5;
-            filter: drop-shadow(8px 12px 8px rgba(0,0,0,0.3));
+            opacity: 0.7;
         }
-        .tree-left { left: 10px; }
-        .tree-right { right: 10px; transform: scaleX(-1); }
-        .tree-svg { width: 100%; height: auto; display: block; }
+        .leaf-left { left: 0; }
+        .leaf-right { right: 0; transform: scaleX(-1); }
 
         .game-container {
-            max-width: 750px;
+            max-width: 800px;
             width: 100%;
-            background: rgba(255,248,225,0.94);
+            background: rgba(255, 248, 225, 0.96);
             backdrop-filter: blur(8px);
             border-radius: 64px;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5);
             overflow: hidden;
-            transition: transform 0.1s ease;
             position: relative;
             z-index: 20;
-            margin-bottom: 30px;
-            touch-action: pan-y pinch-zoom;
         }
 
         .game-scroll {
-            max-height: 75vh;
+            max-height: 80vh;
             overflow-y: auto;
             padding: 20px 18px 30px;
             scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
         }
 
         .counter-card {
@@ -122,24 +116,29 @@
         }
 
         .merchant-panel {
-            background: #faeecd;
+            background: linear-gradient(135deg, #faeecd, #f5e2b5);
             border-radius: 48px;
             padding: 14px;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
-        .progress-bar {
-            height: 12px;
-            background: #ddc7a0;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 10px 0;
+        .merchant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            font-weight: bold;
         }
 
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            transition: width 0.2s linear;
+        .timer-badge {
+            background: #7f5539;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-family: monospace;
         }
 
         .merchant-stock {
@@ -151,12 +150,13 @@
         }
 
         .variant-card {
-            min-width: 110px;
+            min-width: 130px;
             background: #fff6e6;
             border-radius: 28px;
             padding: 12px 8px;
             text-align: center;
             border: 2px solid #e7bc7e;
+            transition: 0.1s;
         }
 
         .buy-btn {
@@ -167,7 +167,8 @@
             padding: 6px 12px;
             font-weight: bold;
             cursor: pointer;
-            touch-action: manipulation;
+            margin-top: 8px;
+            width: 100%;
         }
 
         .upgrade-scroll {
@@ -175,13 +176,12 @@
             overflow-x: auto;
             gap: 14px;
             padding: 8px 0;
-            -webkit-overflow-scrolling: touch;
         }
 
         .upgrade-item {
             background: #fffaec;
             border-radius: 28px;
-            min-width: 130px;
+            min-width: 140px;
             padding: 12px;
             text-align: center;
         }
@@ -202,11 +202,8 @@
             padding: 10px 18px;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.1s, background 0.2s;
-            touch-action: manipulation;
         }
-        .action-btn:hover { background: #9b6a48; transform: scale(1.02); }
-        .action-btn:active { transform: scale(0.98); }
+        .action-btn:active { transform: scale(0.97); }
 
         .particle-layer {
             position: fixed;
@@ -224,6 +221,13 @@
             pointer-events: none;
             z-index: 250;
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+            animation: sway 0.5s ease-in-out;
+        }
+
+        @keyframes sway {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+            100% { transform: rotate(0deg); }
         }
 
         .ascension-glow {
@@ -246,51 +250,12 @@
             padding: 12px 24px;
             border-radius: 60px;
             font-weight: bold;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
             z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             transition: transform 0.3s ease;
             border: 2px solid #fff;
+            white-space: nowrap;
         }
-        .achievement-toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-        .achievement-toast span { font-size: 1.8rem; }
-
-        .achievements-panel {
-            background: #fff7e8;
-            border-radius: 48px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 8px;
-        }
-        .achievement-card {
-            background: #f0e6d0;
-            border-radius: 24px;
-            padding: 12px;
-            text-align: center;
-            border: 2px solid #c9a87b;
-        }
-        .achievement-card.unlocked {
-            background: linear-gradient(135deg, #ffecb3, #ffe0a3);
-            border-color: #ffaa44;
-            box-shadow: 0 0 10px rgba(255,170,68,0.5);
-        }
-        .achievement-card.locked { opacity: 0.6; filter: grayscale(0.3); }
-        .achievement-icon { font-size: 2.2rem; }
-        .achievement-name { font-weight: bold; font-size: 0.8rem; margin-top: 6px; }
-        .achievement-desc { font-size: 0.65rem; color: #6b4c2c; }
-        .achievement-reward { font-size: 0.7rem; color: #d4a017; font-weight: bold; margin-top: 4px; }
+        .achievement-toast.show { transform: translateX(-50%) translateY(0); }
 
         .modal {
             position: fixed;
@@ -314,90 +279,36 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        .close-btn {
-            background: #b36b3c;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 8px 20px;
-            cursor: pointer;
-            margin-top: 16px;
-            touch-action: manipulation;
-        }
-        .import-area {
-            margin-top: 16px;
-            padding: 12px;
-            background: #f0e6d0;
-            border-radius: 32px;
-        }
         .import-textarea {
             width: 100%;
             padding: 8px;
             border-radius: 20px;
             border: 2px solid #c9a87b;
             font-family: monospace;
-            font-size: 0.8rem;
-            background: #fffef7;
         }
-        .import-btn {
-            background: #4c8b3c;
-            margin-top: 8px;
-            padding: 6px 16px;
+        .save-text { font-size: 0.7rem; text-align: center; margin-top: 16px; color: #8b6946; cursor: pointer; background: #f0e6d0; padding: 6px 12px; border-radius: 40px; display: inline-block; }
+        .save-bar { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+        .merchant-fresh {
+            animation: pulseGreen 0.5s ease;
         }
-        .sound-toggle {
-            background: #7f5539;
-            color: white;
-            border: none;
-            border-radius: 60px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 6px;
-            touch-action: manipulation;
+        @keyframes pulseGreen {
+            0% { background: #faeecd; }
+            50% { background: #c8e6b5; }
+            100% { background: #faeecd; }
         }
-        .enable-sound-btn {
-            background: #ffaa44;
-            color: #3d2b1a;
-            border: none;
-            border-radius: 60px;
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            animation: pulse 1s infinite;
-            touch-action: manipulation;
-        }
-        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
-
-        @media (max-width: 900px) { 
-            .tree-left, .tree-right { width: 140px; }
-            .coconut-btn { font-size: 4rem; }
-        }
-        .save-text { font-size: 0.7rem; text-align: center; margin-top: 16px; color: #8b6946; cursor: pointer; display: inline-block; background: #f0e6d0; padding: 6px 12px; border-radius: 40px; margin-right: 8px; touch-action: manipulation; }
-        .save-bar { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-
-        /* Prevent zoom on input focus */
-        input, textarea, button {
-            font-size: 16px;
+        @media (max-width: 600px) {
+            .coconut-btn { font-size: 3.8rem; }
+            .variant-card { min-width: 115px; }
         }
     </style>
 </head>
 <body>
 
-<div class="tree-left">
-    <svg class="tree-svg" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100,400 L80,280 L60,300 L90,220 L50,230 L85,160 L40,170 L80,100 L70,50 L100,20 L130,50 L120,100 L160,170 L115,160 L150,230 L110,220 L140,300 L120,280 L100,400Z" fill="#5D3A1A" stroke="#3E2710" stroke-width="3"/>
-        <rect x="88" y="360" width="24" height="40" fill="#7A4A2A"/>
-    </svg>
+<div class="leaf-left">
+    <svg width="180" height="300" viewBox="0 0 200 300" fill="none"><path d="M20,280 Q80,200 40,100 Q100,150 160,80 Q130,160 170,220 Q120,250 100,300 Z" fill="#2d6a4f" opacity="0.7"/></svg>
 </div>
-<div class="tree-right">
-    <svg class="tree-svg" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100,400 L80,280 L60,300 L90,220 L50,230 L85,160 L40,170 L80,100 L70,50 L100,20 L130,50 L120,100 L160,170 L115,160 L150,230 L110,220 L140,300 L120,280 L100,400Z" fill="#5D3A1A" stroke="#3E2710" stroke-width="3"/>
-        <rect x="88" y="360" width="24" height="40" fill="#7A4A2A"/>
-    </svg>
+<div class="leaf-right">
+    <svg width="180" height="300" viewBox="0 0 200 300" fill="none"><path d="M180,280 Q120,200 160,100 Q100,150 40,80 Q70,160 30,220 Q80,250 100,300 Z" fill="#2d6a4f" opacity="0.7"/></svg>
 </div>
 
 <div class="game-container">
@@ -408,8 +319,8 @@
                 🌴 Ascension Tier: <span id="ascensionTier">0</span>
                 <span id="ascensionBoostSpan">(+0%)</span>
             </div>
-            <div class="progress-bar" style="margin-top:12px;">
-                <div class="progress-fill" id="ascensionProgressFill" style="background:#d4a017;"></div>
+            <div class="progress-bar" style="height:12px; background:#ddc7a0; border-radius:20px; margin-top:12px;">
+                <div id="ascensionProgressFill" style="width:0%; height:100%; background:#d4a017; border-radius:20px;"></div>
             </div>
             <div id="nextAscensionInfo" style="font-size:0.7rem;">Next ascension: 1,000,000 🥥</div>
         </div>
@@ -423,9 +334,14 @@
             </div>
         </div>
 
-        <div class="merchant-panel">
-            <div>🏪 Tropical Merchant (special coconuts)</div>
+        <!-- ROTATING MERCHANT with timer & many coconut types -->
+        <div class="merchant-panel" id="merchantPanel">
+            <div class="merchant-header">
+                <span>🏪 Tropical Merchant (rotating stock)</span>
+                <span class="timer-badge" id="refreshTimer">🔄 30s</span>
+            </div>
             <div class="merchant-stock" id="merchantStock"></div>
+            <div style="font-size:0.7rem; text-align:center; margin-top:8px;">✨ New exotic coconuts every 30 seconds!</div>
         </div>
 
         <div>
@@ -437,7 +353,7 @@
             <button class="action-btn" id="ascendBtn">🌺 ASCEND 🌺</button>
             <button class="action-btn" id="resetStatsBtn">🗑️ Soft Reset</button>
             <button class="action-btn" id="showAchievementsBtn">🏆 Achievements</button>
-            <button class="action-btn" id="importExportBtn">💾 Import/Export</button>
+            <button class="action-btn" id="importExportBtn">💾 Save/Load</button>
         </div>
         <div class="save-bar">
             <div class="save-text" id="saveIndicator">💾 Auto-saved</div>
@@ -447,17 +363,26 @@
 
 <div class="particle-layer" id="particleLayer"></div>
 <div class="ascension-glow" id="ascensionGlow"></div>
-<div id="achievementToast" class="achievement-toast">🎉 <span></span> <span id="toastMsg"></span></div>
+<div id="achievementToast" class="achievement-toast">🎉 <span id="toastMsg"></span></div>
 
 <script>
-    // Prevent double-tap zoom on the whole document
-    document.addEventListener('touchstart', function(e) {
-        if (e.touches.length > 1) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    // ------------------- GAME STATE -------------------
+    // ------------------- 12+ UNIQUE COCONUT VARIANTS (different kinds) -------------------
+    const COCONUT_VAULT = [
+        { id: "golden", name: "✨ Golden Coconut", basePrice: 500, gain: 200, emoji: "🌟", desc: "Lucky golden shine" },
+        { id: "jumbo", name: "🐘 Jumbo Coconut", basePrice: 1800, gain: 850, emoji: "🥥💥", desc: "Massive tropical fruit" },
+        { id: "magical", name: "🔮 Magical Coconut", basePrice: 6000, gain: 3200, emoji: "✨", desc: "Enchanted essence" },
+        { id: "dragon", name: "🐉 Dragon Coconut", basePrice: 15000, gain: 7800, emoji: "🐉🔥", desc: "Volcanic spirit" },
+        { id: "frost", name: "❄️ Frost Coconut", basePrice: 22000, gain: 12000, emoji: "🧊", desc: "Chilled from north" },
+        { id: "rainbow", name: "🌈 Rainbow Coconut", basePrice: 35000, gain: 20000, emoji: "🌈", desc: "Taste the spectrum" },
+        { id: "void", name: "🌑 Void Coconut", basePrice: 55000, gain: 33000, emoji: "🌌", desc: "Abyssal harvest" },
+        { id: "mecha", name: "🤖 Mecha Coconut", basePrice: 80000, gain: 50000, emoji: "⚙️", desc: "Cyber-coconut" },
+        { id: "phoenix", name: "🔥 Phoenix Coconut", basePrice: 120000, gain: 75000, emoji: "🕊️🔥", desc: "Rebirth flames" },
+        { id: "cosmic", name: "🌠 Cosmic Coconut", basePrice: 180000, gain: 110000, emoji: "🌠", desc: "Stardust infused" },
+        { id: "ancient", name: "🏺 Ancient Coconut", basePrice: 250000, gain: 160000, emoji: "🏺", desc: "Lost civilization" },
+        { id: "godly", name: "👑 Godly Coconut", basePrice: 500000, gain: 350000, emoji: "👑✨", desc: "Ascended fruit" }
+    ];
+
+    // Game state
     let state = {
         coconuts: 0,
         totalCoconutsEarned: 0,
@@ -465,21 +390,16 @@
         passivePerSecond: 0,
         ascensionTier: 0,
         totalClicks: 0,
-        upgrades: {
-            strongerFingers: 0,    // +1 click power
-            monkeyHelpers: 0,      // +0.5 passive
-            coconutFertilizer: 0   // +0.3 multi
-        },
-        specialsBought: { golden:0, jumbo:0, magical:0 },
+        upgrades: { strongerFingers: 0, monkeyHelpers: 0, coconutFertilizer: 0 },
+        specialsBought: {}, // dynamic
         ascensionBonus: 0,
         lastTimestamp: Date.now()
     };
 
-    const specials = [
-        { id: 'golden', name: '✨ Golden Coconut', basePrice: 500, gainCoconuts: 200, emoji: '🌟', desc: '+200 🥥 instantly' },
-        { id: 'jumbo', name: '🐘 Jumbo Coconut', basePrice: 1800, gainCoconuts: 850, emoji: '🥥💥', desc: '+850 🥥' },
-        { id: 'magical', name: '🔮 Magical Coconut', basePrice: 6000, gainCoconuts: 3200, emoji: '✨', desc: '+3200 🥥' }
-    ];
+    // Initialize bought counters for all coconut types
+    function initBoughtCounters() {
+        COCONUT_VAULT.forEach(c => { if(state.specialsBought[c.id] === undefined) state.specialsBought[c.id] = 0; });
+    }
 
     const upgradesList = [
         { id: 'strongerFingers', name: '💪 Stronger Fingers', baseCost: 50, effect: () => { state.clickPower += 1; }, desc: '+1 click power', getCost: (lvl) => 50 + (lvl * 40) },
@@ -488,69 +408,105 @@
     ];
 
     let achievements = [
-        { id: 'click100', name: 'Novice Clicker', desc: '100 total clicks', req: () => state.totalClicks >= 100, reward: 50, icon: '🖱️', unlocked: false },
+        { id: 'click100', name: 'Novice Clicker', desc: '100 clicks', req: () => state.totalClicks >= 100, reward: 50, icon: '🖱️', unlocked: false },
         { id: 'click1k', name: 'Coconut Mania', desc: '1000 clicks', req: () => state.totalClicks >= 1000, reward: 300, icon: '🖱️🖱️', unlocked: false },
         { id: 'coconutMillion', name: 'Millionaire Farmer', desc: '1M total earned', req: () => state.totalCoconutsEarned >= 1000000, reward: 1000, icon: '💸', unlocked: false },
         { id: 'ascend1', name: 'First Ascension', desc: 'Ascend once', req: () => state.ascensionTier >= 1, reward: 5000, icon: '🌴', unlocked: false },
         { id: 'ascend5', name: 'Enlightened Grove', desc: 'Ascend 5 times', req: () => state.ascensionTier >= 5, reward: 25000, icon: '🌺', unlocked: false },
-        { id: 'merchantSpree', name: 'Loyal Customer', desc: 'Buy 20 specials', req: () => (state.specialsBought.golden+state.specialsBought.jumbo+state.specialsBought.magical) >= 20, reward: 1500, icon: '🏪', unlocked: false },
-        { id: 'maxPower', name: 'Finger of God', desc: 'Click power 25+', req: () => state.clickPower >= 25, reward: 10000, icon: '⚡', unlocked: false }
+        { id: 'merchantSpree', name: 'Loyal Customer', desc: 'Buy 30 specials', req: () => Object.values(state.specialsBought).reduce((a,b)=>a+b,0) >= 30, reward: 1500, icon: '🏪', unlocked: false },
+        { id: 'maxPower', name: 'Finger of God', desc: 'Click power 25+', req: () => state.clickPower >= 25, reward: 10000, icon: '⚡', unlocked: false },
+        { id: 'dragonFeast', name: 'Dragon Tamer', desc: 'Buy Dragon Coconut', req: () => (state.specialsBought['dragon']||0) >= 1, reward: 8000, icon: '🐉', unlocked: false },
+        { id: 'cosmicExplorer', name: 'Star Seeker', desc: 'Buy Cosmic Coconut', req: () => (state.specialsBought['cosmic']||0) >= 1, reward: 25000, icon: '🌠', unlocked: false }
     ];
 
-    function saveGame() { 
-        localStorage.setItem('coconutAscension', JSON.stringify(state)); 
-        localStorage.setItem('achievements', JSON.stringify(achievements.map(a=>a.unlocked))); 
-        const indicator = document.getElementById('saveIndicator');
-        if(indicator) indicator.innerHTML = '💾 Saved!';
-        setTimeout(()=>{ if(document.getElementById('saveIndicator')) document.getElementById('saveIndicator').innerHTML = '💾 Auto-saved'; },1500);
-    }
-    
-    function loadGame() {
-        const saved = localStorage.getItem('coconutAscension');
-        if(saved) {
-            try {
-                const loaded = JSON.parse(saved);
-                state = { ...state, ...loaded };
-                if(!state.specialsBought) state.specialsBought = { golden:0, jumbo:0, magical:0 };
-                if(!state.totalCoconutsEarned) state.totalCoconutsEarned = state.coconuts;
-                if(!state.upgrades) state.upgrades = { strongerFingers:0, monkeyHelpers:0, coconutFertilizer:0 };
-            } catch(e) { console.warn(e); }
+    // ----- ROTATING MERCHANT LOGIC (changes every 30 seconds, random 3 distinct coconuts) -----
+    let currentMerchantItems = [];
+    let merchantInterval = null;
+    let countdownSeconds = 30;
+
+    function pickRandomCoconuts(count = 3) {
+        // shuffle copy and pick unique
+        let shuffled = [...COCONUT_VAULT];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
-        const achSaved = localStorage.getItem('achievements');
-        if(achSaved) {
-            try {
-                const unlocks = JSON.parse(achSaved);
-                achievements.forEach((ach, idx) => { if(unlocks[idx]) ach.unlocked = true; });
-            } catch(e) {}
-        }
-        recalcPassiveFromUpgrades();
-        updateUI();
+        return shuffled.slice(0, count);
     }
 
-    function importSaveData(jsonString) {
-        try {
-            const imported = JSON.parse(jsonString);
-            if(!imported || typeof imported !== 'object') throw new Error('Invalid save');
-            if(imported.coconuts === undefined) throw new Error('Missing coconut data');
-            state = { ...state, ...imported };
-            if(!state.specialsBought) state.specialsBought = { golden:0, jumbo:0, magical:0 };
-            if(!state.upgrades) state.upgrades = { strongerFingers:0, monkeyHelpers:0, coconutFertilizer:0 };
-            recalcPassiveFromUpgrades();
+    function refreshMerchant() {
+        currentMerchantItems = pickRandomCoconuts(3);
+        renderMerchant();
+        // Flash animation
+        const panel = document.getElementById('merchantPanel');
+        panel.classList.add('merchant-fresh');
+        setTimeout(() => panel.classList.remove('merchant-fresh'), 500);
+        // reset countdown visual
+        countdownSeconds = 30;
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        const timerSpan = document.getElementById('refreshTimer');
+        if(timerSpan) timerSpan.innerText = `🔄 ${countdownSeconds}s`;
+    }
+
+    function startMerchantRotation() {
+        if(merchantInterval) clearInterval(merchantInterval);
+        refreshMerchant(); // initial stock
+        merchantInterval = setInterval(() => {
+            countdownSeconds--;
+            updateTimerDisplay();
+            if(countdownSeconds <= 0) {
+                refreshMerchant();
+                countdownSeconds = 30;
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+
+    function buySpecial(specialId, itemPrice, gainAmount) {
+        if(state.coconuts >= itemPrice) {
+            state.coconuts -= itemPrice;
+            addCoconuts(gainAmount);
+            state.specialsBought[specialId] = (state.specialsBought[specialId] || 0) + 1;
             updateUI();
+            checkAchievements();
+            showToast(`Bought ${COCONUT_VAULT.find(c=>c.id===specialId)?.name || specialId} +${gainAmount} 🥥`, '🛒');
             saveGame();
-            showToast('import', 'Game imported successfully!', '📥');
-            return true;
-        } catch(e) {
-            showToast('error', 'Invalid save file!', '❌');
-            return false;
+        } else {
+            showToast(`Not enough 🥥! Need ${itemPrice.toLocaleString()}`, '⚠️');
         }
     }
 
-    function recalcPassiveFromUpgrades() {
-        let base = (state.upgrades.monkeyHelpers * 0.5) + (state.upgrades.coconutFertilizer * 0.3);
-        state.passivePerSecond = base;
+    function renderMerchant() {
+        const container = document.getElementById('merchantStock');
+        if(!container) return;
+        container.innerHTML = '';
+        if(currentMerchantItems.length === 0) return;
+        for(let item of currentMerchantItems) {
+            let price = item.basePrice;
+            // apply ascension discount? no, keep base but could show fun
+            let div = document.createElement('div');
+            div.className = 'variant-card';
+            div.innerHTML = `
+                <div style="font-size:2.5rem;">${item.emoji}</div>
+                <div><strong>${item.name}</strong></div>
+                <div style="font-size:0.7rem;">${item.desc}</div>
+                <div>💰 ${price.toLocaleString()}</div>
+                <div style="font-size:0.7rem;">✨ +${item.gain} 🥥</div>
+                <button class="buy-btn" data-id="${item.id}" data-price="${price}" data-gain="${item.gain}">Buy Coconut</button>
+            `;
+            const btn = div.querySelector('button');
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                buySpecial(item.id, parseInt(btn.dataset.price), parseInt(btn.dataset.gain));
+            });
+            container.appendChild(div);
+        }
     }
 
+    // ----- Core mechanics -----
     function addCoconuts(amount, isClick=false) {
         let gain = amount;
         if(isClick) {
@@ -569,41 +525,27 @@
 
     function buyUpgrade(upgradeId) {
         const up = upgradesList.find(u => u.id === upgradeId);
-        if(!up) return;
         let lvl = state.upgrades[upgradeId] || 0;
         let cost = up.getCost(lvl);
         if(state.coconuts >= cost) {
             spendCoconuts(cost);
             state.upgrades[upgradeId] = lvl + 1;
             up.effect();
-            recalcPassiveFromUpgrades();
             updateUI();
             checkAchievements();
-            showToast('upgrade', `Purchased ${up.name}!`, '🔨');
-        }
-    }
-
-    function buySpecial(specialId) {
-        const spec = specials.find(s=>s.id === specialId);
-        let price = spec.basePrice;
-        if(state.coconuts >= price) {
-            spendCoconuts(price);
-            addCoconuts(spec.gainCoconuts);
-            state.specialsBought[specialId] = (state.specialsBought[specialId] || 0) + 1;
-            updateUI();
-            checkAchievements();
-            showToast('special', `Bought ${spec.name} +${spec.gainCoconuts} 🥥`, spec.emoji);
+            showToast(`Upgraded ${up.name}`, '🔨');
+            saveGame();
         }
     }
 
     function performAscension() {
         let required = getAscensionCost();
-        if(state.totalCoconutsEarned >= required && state.ascensionTier < 20) {
+        if(state.totalCoconutsEarned >= required && state.ascensionTier < 30) {
             const glow = document.getElementById('ascensionGlow');
             glow.style.opacity = '0.6';
             setTimeout(()=> glow.style.opacity = '0', 800);
             let newTier = state.ascensionTier + 1;
-            let bonusPercent = newTier * 10;
+            let bonusPercent = newTier * 12;
             let preserved = {
                 ascensionTier: newTier,
                 ascensionBonus: bonusPercent,
@@ -613,7 +555,7 @@
                 upgrades: { strongerFingers:0, monkeyHelpers:0, coconutFertilizer:0 }
             };
             state.coconuts = 0;
-            state.clickPower = 1 + Math.floor(bonusPercent/20);
+            state.clickPower = 1 + Math.floor(bonusPercent/25);
             state.passivePerSecond = 0;
             state.upgrades = preserved.upgrades;
             state.ascensionTier = preserved.ascensionTier;
@@ -621,72 +563,44 @@
             state.totalCoconutsEarned = preserved.totalCoconutsEarned;
             state.totalClicks = preserved.totalClicks;
             state.specialsBought = preserved.specialsBought;
+            initBoughtCounters();
             recalcPassiveFromUpgrades();
             updateUI();
-            showToast('ascend', `Ascended to Tier ${state.ascensionTier}! +${state.ascensionBonus}% future bonus`, '🌴');
+            showToast(`Ascended to Tier ${state.ascensionTier}! +${state.ascensionBonus}% bonus`, '🌴');
             saveGame();
         } else {
-            showToast('error', `Need ${required.toLocaleString()} total coconuts to ascend`, '⚠️');
+            showToast(`Need ${required.toLocaleString()} total coconuts to ascend`, '⚠️');
         }
     }
 
     function getAscensionCost() { return 1000000 * (state.ascensionTier + 1); }
-
-    function getAscensionProgress() {
-        let required = getAscensionCost();
-        let progress = Math.min(1, state.totalCoconutsEarned / required);
-        return progress * 100;
-    }
+    function getAscensionProgress() { let required = getAscensionCost(); return Math.min(1, state.totalCoconutsEarned / required) * 100; }
+    function recalcPassiveFromUpgrades() { state.passivePerSecond = (state.upgrades.monkeyHelpers * 0.5) + (state.upgrades.coconutFertilizer * 0.3); }
 
     function updateUI() {
         document.getElementById('coconutDisplay').innerText = Math.floor(state.coconuts).toLocaleString();
         document.getElementById('clickPower').innerText = state.clickPower;
         document.getElementById('passiveIncome').innerText = state.passivePerSecond.toFixed(1);
         document.getElementById('ascensionTier').innerText = state.ascensionTier;
-        let boostPercent = state.ascensionBonus || (state.ascensionTier*10);
+        let boostPercent = state.ascensionBonus || (state.ascensionTier*12);
         document.getElementById('ascensionBoostSpan').innerHTML = `(+${boostPercent}% bonus)`;
         document.getElementById('totalClicks').innerText = state.totalClicks;
-        let ascProgress = getAscensionProgress();
-        document.getElementById('ascensionProgressFill').style.width = ascProgress + '%';
-        let nextCost = getAscensionCost();
-        document.getElementById('nextAscensionInfo').innerHTML = `Next ascension: ${nextCost.toLocaleString()} 🥥 total`;
-        renderMerchant();
+        document.getElementById('ascensionProgressFill').style.width = getAscensionProgress() + '%';
+        document.getElementById('nextAscensionInfo').innerHTML = `Next ascension: ${getAscensionCost().toLocaleString()} 🥥 total`;
         renderUpgrades();
-    }
-
-    function renderMerchant() {
-        const container = document.getElementById('merchantStock');
-        if(!container) return;
-        container.innerHTML = '';
-        specials.forEach(spec => {
-            let price = spec.basePrice;
-            let div = document.createElement('div');
-            div.className = 'variant-card';
-            div.innerHTML = `<div style="font-size:2rem;">${spec.emoji}</div>
-                            <div><strong>${spec.name}</strong></div>
-                            <div style="font-size:0.7rem;">${spec.desc}</div>
-                            <div>💰 ${price.toLocaleString()}</div>
-                            <button class="buy-btn" data-id="${spec.id}">Buy 🥥</button>`;
-            div.querySelector('button').addEventListener('click', (e) => { e.stopPropagation(); buySpecial(spec.id); });
-            container.appendChild(div);
-        });
+        renderMerchant(); 
     }
 
     function renderUpgrades() {
         const container = document.getElementById('upgradeList');
-        if(!container) return;
         container.innerHTML = '';
         upgradesList.forEach(up => {
             let lvl = state.upgrades[up.id] || 0;
             let cost = up.getCost(lvl);
             let div = document.createElement('div');
             div.className = 'upgrade-item';
-            div.innerHTML = `<div><strong>${up.name}</strong></div>
-                            <div style="font-size:0.7rem;">${up.desc}</div>
-                            <div>Level ${lvl}</div>
-                            <div>💰 ${cost.toLocaleString()}</div>
-                            <button class="buy-btn" data-id="${up.id}">Upgrade</button>`;
-            div.querySelector('button').addEventListener('click', (e) => { e.stopPropagation(); buyUpgrade(up.id); });
+            div.innerHTML = `<div><strong>${up.name}</strong></div><div style="font-size:0.7rem;">${up.desc}</div><div>Level ${lvl}</div><div>💰 ${cost.toLocaleString()}</div><button class="buy-btn" data-id="${up.id}">Upgrade</button>`;
+            div.querySelector('button').addEventListener('click', () => buyUpgrade(up.id));
             container.appendChild(div);
         });
     }
@@ -696,34 +610,28 @@
         const coconut = document.createElement('div');
         coconut.className = 'falling-coconut';
         coconut.innerText = '🥥';
-        const left = Math.random() * window.innerWidth;
-        coconut.style.left = left + 'px';
+        coconut.style.left = Math.random() * window.innerWidth + 'px';
         coconut.style.top = '-50px';
         coconut.style.position = 'fixed';
         coconut.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
-        coconut.style.opacity = '0.9';
         layer.appendChild(coconut);
         let fall = 0;
         const interval = setInterval(() => {
             fall += 8;
             coconut.style.top = fall + 'px';
-            if(fall > window.innerHeight + 100) {
-                clearInterval(interval);
-                coconut.remove();
-            }
+            if(fall > window.innerHeight + 100) { clearInterval(interval); coconut.remove(); }
         }, 30);
         setTimeout(() => { clearInterval(interval); if(coconut) coconut.remove(); }, 3000);
     }
 
     let toastTimeout = null;
-    function showToast(type, message, icon='🎉') {
+    function showToast(message, icon='🎉') {
         const toast = document.getElementById('achievementToast');
         if(!toast) return;
-        document.getElementById('toastMsg').innerText = message;
-        toast.querySelector('span').innerText = icon;
+        document.getElementById('toastMsg').innerHTML = `${icon} ${message}`;
         toast.classList.add('show');
         if(toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 2300);
     }
 
     function checkAchievements() {
@@ -733,128 +641,63 @@
                 ach.unlocked = true;
                 newUnlock = true;
                 addCoconuts(ach.reward);
-                showToast('achievement', `${ach.name} +${ach.reward}🥥`, ach.icon);
+                showToast(`${ach.name} +${ach.reward}🥥`, ach.icon);
             }
         });
-        if(newUnlock) renderAchievementPanel();
-        saveGame();
-    }
-
-    function renderAchievementPanel() {
-        let panel = document.getElementById('achievementsGrid');
-        if(!panel) return;
-        panel.innerHTML = '';
-        achievements.forEach(ach => {
-            let card = document.createElement('div');
-            card.className = `achievement-card ${ach.unlocked ? 'unlocked' : 'locked'}`;
-            card.innerHTML = `<div class="achievement-icon">${ach.icon}</div>
-                              <div class="achievement-name">${ach.name}</div>
-                              <div class="achievement-desc">${ach.desc}</div>
-                              <div class="achievement-reward">🎁 +${ach.reward}</div>`;
-            panel.appendChild(card);
-        });
-    }
-
-    let modalActive = false;
-    function showAchievementsModal() {
-        if(modalActive) return;
-        modalActive = true;
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal';
-        modalDiv.innerHTML = `<div class="modal-card"><h2>🏆 Achievements</h2><div id="achievementsGrid" class="achievements-grid"></div><button class="close-btn" id="closeModalBtn">Close</button></div>`;
-        document.body.appendChild(modalDiv);
-        renderAchievementPanel();
-        document.getElementById('closeModalBtn').addEventListener('click', () => { modalDiv.remove(); modalActive=false; });
-        modalDiv.addEventListener('click', (e) => { if(e.target === modalDiv) { modalDiv.remove(); modalActive=false; } });
-    }
-
-    function showImportExportModal() {
-        if(modalActive) return;
-        modalActive = true;
-        const exportData = JSON.stringify(state, null, 2);
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal';
-        modalDiv.innerHTML = `<div class="modal-card">
-            <h2>💾 Import / Export Save</h2>
-            <div class="import-area">
-                <div><strong>📤 Export Save Data:</strong></div>
-                <textarea id="exportJsonArea" class="import-textarea" rows="4" readonly>${exportData.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
-                <button id="copyExportBtn" class="action-btn" style="background:#7f5539; margin-top:8px;">📋 Copy to Clipboard</button>
-            </div>
-            <div class="import-area" style="margin-top:16px;">
-                <div><strong>📥 Import Save:</strong></div>
-                <textarea id="importJsonArea" class="import-textarea" rows="4" placeholder="Paste your saved JSON here..."></textarea>
-                <button id="confirmImportBtn" class="action-btn import-btn" style="background:#4c8b3c;">⬇️ Import Game</button>
-            </div>
-            <button class="close-btn" id="closeImportModal">Close</button>
-        </div>`;
-        document.body.appendChild(modalDiv);
-        
-        document.getElementById('copyExportBtn').addEventListener('click', () => {
-            const textarea = document.getElementById('exportJsonArea');
-            textarea.select();
-            document.execCommand('copy');
-            showToast('info', 'Save copied to clipboard!', '📋');
-        });
-        document.getElementById('confirmImportBtn').addEventListener('click', () => {
-            const importText = document.getElementById('importJsonArea').value;
-            if(importText.trim()) {
-                if(importSaveData(importText)) {
-                    modalDiv.remove();
-                    modalActive = false;
-                }
-            } else {
-                showToast('error', 'Paste save data first', '⚠️');
-            }
-        });
-        document.getElementById('closeImportModal').addEventListener('click', () => { modalDiv.remove(); modalActive=false; });
-        modalDiv.addEventListener('click', (e) => { if(e.target === modalDiv) { modalDiv.remove(); modalActive=false; } });
+        if(newUnlock) saveGame();
     }
 
     function softReset() {
-        if(confirm('Soft reset will reset coconuts, upgrades & specials but keep ascension tier & total clicks? (Achievements stay)')) {
+        if(confirm('Soft reset: lose coconuts, upgrades, special purchases? (Ascension tier & achievements remain)')) {
             state.coconuts = 0;
-            state.clickPower = 1 + Math.floor((state.ascensionBonus||0)/20);
+            state.clickPower = 1 + Math.floor((state.ascensionBonus||0)/25);
             state.upgrades = { strongerFingers:0, monkeyHelpers:0, coconutFertilizer:0 };
             state.passivePerSecond = 0;
-            state.specialsBought = { golden:0, jumbo:0, magical:0 };
+            state.specialsBought = {};
+            initBoughtCounters();
             recalcPassiveFromUpgrades();
             updateUI();
             saveGame();
-            showToast('reset', 'Game soft reset!', '🔄');
+            showToast('Game soft reset!', '🔄');
         }
     }
 
-    let intervalId = null;
-    function startPassiveIncome() {
-        if(intervalId) clearInterval(intervalId);
-        intervalId = setInterval(() => {
-            if(state.passivePerSecond > 0) {
-                let gain = state.passivePerSecond;
-                addCoconuts(gain);
-                updateUI();
-            }
-        }, 1000);
+    function importExportModal() {
+        let modalDiv = document.createElement('div');
+        modalDiv.className = 'modal';
+        modalDiv.innerHTML = `<div class="modal-card"><h2>💾 Save / Load</h2><div class="import-area"><textarea id="exportData" class="import-textarea" rows="4" readonly>${JSON.stringify(state, null, 2)}</textarea><button id="copyBtn" class="action-btn" style="margin-top:8px;">📋 Copy Save</button></div><div class="import-area"><textarea id="importData" class="import-textarea" rows="4" placeholder="Paste save data..."></textarea><button id="importBtn" class="action-btn" style="background:#4c8b3c;">⬇️ Import</button></div><button class="close-btn" id="closeModalBtn">Close</button></div>`;
+        document.body.appendChild(modalDiv);
+        document.getElementById('copyBtn').onclick = () => { document.getElementById('exportData').select(); document.execCommand('copy'); showToast('Copied to clipboard!', '📋'); };
+        document.getElementById('importBtn').onclick = () => { let txt = document.getElementById('importData').value; try { let parsed = JSON.parse(txt); if(parsed.coconuts !== undefined) { Object.assign(state, parsed); initBoughtCounters(); recalcPassiveFromUpgrades(); updateUI(); saveGame(); showToast('Game imported!', '✅'); modalDiv.remove(); } else throw new Error(); } catch(e) { showToast('Invalid save file!', '❌'); } };
+        document.getElementById('closeModalBtn').onclick = () => modalDiv.remove();
+        modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
     }
+
+    function saveGame() { localStorage.setItem('coconutAscensionV2', JSON.stringify(state)); localStorage.setItem('achievementsV2', JSON.stringify(achievements.map(a=>a.unlocked))); document.getElementById('saveIndicator').innerHTML = '💾 Saved!'; setTimeout(()=> { if(document.getElementById('saveIndicator')) document.getElementById('saveIndicator').innerHTML = '💾 Auto-saved'; }, 1500); }
+    function loadGame() {
+        let saved = localStorage.getItem('coconutAscensionV2');
+        if(saved) { try { let loaded = JSON.parse(saved); state = { ...state, ...loaded }; } catch(e) {} }
+        let achSaved = localStorage.getItem('achievementsV2');
+        if(achSaved) { try { let unlocks = JSON.parse(achSaved); achievements.forEach((ach,idx) => { if(unlocks[idx]) ach.unlocked = true; }); } catch(e) {} }
+        initBoughtCounters();
+        recalcPassiveFromUpgrades();
+        updateUI();
+    }
+
+    let passiveInterval = null;
+    function startPassive() { if(passiveInterval) clearInterval(passiveInterval); passiveInterval = setInterval(() => { if(state.passivePerSecond > 0) { addCoconuts(state.passivePerSecond); updateUI(); } }, 1000); }
 
     function init() {
         loadGame();
-        startPassiveIncome();
-        document.getElementById('clickCoconutBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            let gain = state.clickPower;
-            let bonusPercent = state.ascensionBonus || (state.ascensionTier*10);
-            let totalGain = Math.floor(gain * (1 + bonusPercent/100));
-            addCoconuts(totalGain, true);
-            updateUI();
-        });
-        document.getElementById('ascendBtn').addEventListener('click', performAscension);
-        document.getElementById('resetStatsBtn').addEventListener('click', softReset);
-        document.getElementById('showAchievementsBtn').addEventListener('click', showAchievementsModal);
-        document.getElementById('importExportBtn').addEventListener('click', showImportExportModal);
+        startPassive();
+        startMerchantRotation();
+        document.getElementById('clickCoconutBtn').addEventListener('click', () => { let gain = state.clickPower; let bonus = state.ascensionBonus || (state.ascensionTier*12); let total = Math.floor(gain * (1 + bonus/100)); addCoconuts(total, true); updateUI(); });
+        document.getElementById('ascendBtn').onclick = performAscension;
+        document.getElementById('resetStatsBtn').onclick = softReset;
+        document.getElementById('showAchievementsBtn').onclick = () => { let achStr = achievements.map(a=>`${a.unlocked?'✅':'🔒'} ${a.name}: ${a.desc} (+${a.reward})`).join('\n'); alert('🏆 Achievements:\n' + achStr); };
+        document.getElementById('importExportBtn').onclick = importExportModal;
         setInterval(() => saveGame(), 30000);
     }
-
     init();
 </script>
 </body>
