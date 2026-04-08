@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Coconut Clicker - Click the Coconut!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3b 50%, #1a472a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, #f5e6c8, #e8d5b7);
+            border-radius: 60px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            text-align: center;
+            max-width: 550px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        h1 {
+            color: #5c3a1e;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .coconut {
+            font-size: 180px;
+            cursor: pointer;
+            transition: all 0.08s linear;
+            filter: drop-shadow(12px 15px 0 rgba(0,0,0,0.2));
+            margin: 20px 0;
+            display: inline-block;
+        }
+
+        .coconut:active {
+            transform: scale(0.9);
+            filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.2));
+        }
+
+        .counter {
+            font-size: 56px;
+            font-weight: 800;
+            color: #b87333;
+            background: #fff7e8;
+            padding: 15px 30px;
+            border-radius: 60px;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 8px 0 #c29b4a;
+            font-family: monospace;
+        }
+
+        .stats {
+            background: #fff0d4;
+            padding: 20px;
+            border-radius: 40px;
+            margin: 20px 0;
+        }
+
+        .stat {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #4a2f1d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #b87333;
+            font-size: 22px;
+        }
+
+        button {
+            background: #7f5539;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            margin: 8px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        button:hover {
+            background: #9b6a48;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .upgrade {
+            background: #4c8b3c;
+            font-size: 18px;
+            padding: 14px 32px;
+        }
+
+        .upgrade:hover {
+            background: #5da34a;
+        }
+
+        .reset {
+            background: #8b3c3c;
+        }
+
+        .reset:hover {
+            background: #a34a4a;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #8b6946;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.2);
+            }
+        }
+
+        .floating-number {
+            position: fixed;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffaa33;
+            text-shadow: 2px 2px 0 #5c3a1e;
+            pointer-events: none;
+            z-index: 1000;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-card">
+        <h1>
+            <span>🥥</span> Coconut Clicker <span>🌴</span>
+        </h1>
+        
+        <div class="coconut" id="coconut">
+            🥥
+        </div>
+        
+        <div class="counter" id="counter">
+            0
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <span>⚡ Power per click:</span>
+                <span class="stat-value" id="clickPower">1</span>
+            </div>
+            <div class="stat">
+                <span>👆 Total clicks:</span>
+                <span class="stat-value" id="totalClicks">0</span>
+            </div>
+        </div>
+        
+        <button class="upgrade" id="upgradeBtn">💪 Upgrade Click (+1) - Cost: 50 🥥</button>
+        <br>
+        <button id="saveBtn">💾 Save Progress</button>
+        <button id="loadBtn">📀 Load Progress</button>
+        <button class="reset" id="resetBtn">🔄 Reset All</button>
+        
+        <div class="footer">
+            💡 Tip: Click the coconut! Upgrade to earn more per click.<br>
+            Your progress saves automatically every 30 seconds!
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let coconuts = 0;
+        let clickPower = 1;
+        let totalClicks = 0;
+        let upgradeCost = 50;
+
+        // DOM elements
+        const coconut = document.getElementById('coconut');
+        const counter = document.getElementById('counter');
+        const clickPowerSpan = document.getElementById('clickPower');
+        const totalClicksSpan = document.getElementById('totalClicks');
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Update UI
+        function updateUI() {
+            counter.textContent = Math.floor(coconuts).toLocaleString();
+            clickPowerSpan.textContent = clickPower;
+            totalClicksSpan.textContent = totalClicks.toLocaleString();
+            upgradeBtn.innerHTML = `💪 Upgrade Click (+1) - Cost: ${upgradeCost.toLocaleString()} 🥥`;
+        }
+
+        // Create floating number effect
+        function createFloatingNumber(value, x, y) {
+            const floating = document.createElement('div');
+            floating.className = 'floating-number';
+            floating.textContent = `+${value}`;
+            floating.style.left = x + 'px';
+            floating.style.top = y + 'px';
+            document.body.appendChild(floating);
+            
+            setTimeout(() => {
+                floating.remove();
+            }, 800);
+        }
+
+        // Click coconut
+        function clickCoconut(event) {
+            coconuts += clickPower;
+            totalClicks++;
+            updateUI();
+            
+            // Animation
+            coconut.style.transform = 'scale(0.85)';
+            setTimeout(() => {
+                coconut.style.transform = 'scale(1)';
+            }, 100);
+            
+            // Floating number effect
+            const rect = coconut.getBoundingClientRect();
+            const x = rect.left + rect.width / 2 - 20;
+            const y = rect.top;
+            createFloatingNumber(clickPower, x, y);
+        }
+
+        // Buy upgrade
+        function buyUpgrade() {
+            if (coconuts >= upgradeCost) {
+                coconuts -= upgradeCost;
+                clickPower++;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                updateUI();
+                
+                // Success animation
+                upgradeBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    upgradeBtn.style.transform = 'scale(1)';
+                }, 100);
+            } else {
+                // Not enough coconuts
+                upgradeBtn.style.background = '#8b3c3c';
+                setTimeout(() => {
+                    upgradeBtn.style.background = '#4c8b3c';
+                }, 200);
+            }
+        }
+
+        // Save game
+        function saveGame() {
+            const saveData = {
+                coconuts: coconuts,
+                clickPower: clickPower,
+                totalClicks: totalClicks,
+                upgradeCost: upgradeCost,
+                version: '1.0',
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem('coconutClickerSave', JSON.stringify(saveData));
+            
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '✅ Saved!';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+            }, 1500);
+        }
+
+        // Load game
+        function loadGame() {
+            const savedData = localStorage.getItem('coconutClickerSave');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    coconuts = data.coconuts || 0;
+                    clickPower = data.clickPower || 1;
+                    totalClicks = data.totalClicks || 0;
+                    upgradeCost = data.upgradeCost || 50;
+                    updateUI();
+                    
+                    loadBtn.textContent = '✅ Loaded!';
+                    setTimeout(() => {
+                        loadBtn.textContent = '📀 Load Progress';
+                    }, 1500);
+                } catch(e) {
+                    loadBtn.textContent = '❌ Error!';
+                    setTimeout(() => {
+                        loadBtn.textContent = '📀 Load Progress';
+                    }, 1500);
+                }
+            } else {
+                loadBtn.textContent = '❌ No Save Found';
+                setTimeout(() => {
+                    loadBtn.textContent = '📀 Load Progress';
+                }, 1500);
+            }
+        }
+
+        // Reset game
+        function resetGame() {
+            if (confirm('⚠️ WARNING: This will erase ALL your progress! Are you sure?')) {
+                coconuts = 0;
+                clickPower = 1;
+                totalClicks = 0;
+                upgradeCost = 50;
+                updateUI();
+                
+                resetBtn.textContent = '✅ Reset!';
+                setTimeout(() => {
+                    resetBtn.textContent = '🔄 Reset All';
+                }, 1500);
+            }
+        }
+
+        // Event listeners
+        coconut.addEventListener('click', clickCoconut);
+        upgradeBtn.addEventListener('click', buyUpgrade);
+        saveBtn.addEventListener('click', saveGame);
+        loadBtn.addEventListener('click', loadGame);
+        resetBtn.addEventListener('click', resetGame);
+
+        // Auto-save every 30 seconds
+        setInterval(saveGame, 30000);
+
+        // Initial UI
+        updateUI();
+
+        // Auto-load saved game on start
+        const checkSave = localStorage.getItem('coconutClickerSave');
+        if (checkSave) {
+            setTimeout(() => {
+                if (confirm('🎮 Found saved game! Load your progress?')) {
+                    loadGame();
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
