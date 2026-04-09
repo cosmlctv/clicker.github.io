@@ -33,4 +33,4 @@ To run this game locally:
    ```bash
    git clone https://github.com/cosmlctv/clicker.github.io.git
 
-## this is just a little projact i'm doing, thanks for visiting my page :)
+## This is just a little projact i'm doing, thanks for visiting my page :)
